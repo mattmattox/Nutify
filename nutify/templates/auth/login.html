@@ -1,0 +1,77 @@
+{% extends "dashboard/setup/base.html" %}
+
+{% block title %}Nutify - Login{% endblock %}
+
+{% block content %}
+<div class="setup-container">
+    <div class="setup-header">
+        <img src="{{ url_for('static', filename='img/Nutify-Logo.png') }}" alt="Nutify Logo" class="setup-logo">
+        <h1 class="setup-title">Nutify Login</h1>
+        <div class="setup-intro">
+            <p>UPS Monitoring System</p>
+        </div>
+    </div>
+    
+    <div class="setup-card">
+        <div class="card-heading">
+            <i class="fas fa-sign-in-alt"></i>
+            <h2>User Authentication</h2>
+        </div>
+        <div class="card-content">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' }}"></i>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <form method="POST" id="loginForm">
+                <div class="form-group">
+                    <label for="username">
+                        <i class="fas fa-user"></i>
+                        Username
+                    </label>
+                    <input type="text" id="username" name="username" required 
+                           placeholder="Enter your username" autocomplete="username">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">
+                        <i class="fas fa-lock"></i>
+                        Password
+                    </label>
+                    <input type="password" id="password" name="password" required 
+                           placeholder="Enter your password" autocomplete="current-password">
+                </div>
+                
+                <div class="wizard-actions">
+                    <button type="submit" class="setup-button nav-btn next-btn">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Login
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Focus on username field
+        document.getElementById('username').focus();
+    });
+    
+    // Form submission with loading state
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        const button = this.querySelector('.setup-button');
+        button.disabled = true;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
+    });
+</script>
+{% endblock %} 

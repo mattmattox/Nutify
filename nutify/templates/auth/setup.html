@@ -1,0 +1,164 @@
+{% extends "dashboard/setup/base.html" %}
+
+{% block title %}Nutify - Initial Setup{% endblock %}
+
+{% block content %}
+<div class="setup-container">
+    <div class="setup-header">
+        <img src="{{ url_for('static', filename='img/Nutify-Logo.png') }}" alt="Nutify Logo" class="setup-logo">
+        <h1 class="setup-title">Welcome to Nutify</h1>
+        <div class="setup-intro">
+            <p>Create your administrator account to get started</p>
+            <p class="admin-notice"><i class="fas fa-crown"></i> This will be your main administrator account</p>
+        </div>
+    </div>
+    
+    <div class="setup-card">
+        <div class="card-heading">
+            <i class="fas fa-user-shield"></i>
+            <h2>Administrator Account Setup</h2>
+        </div>
+        <div class="card-content">
+            <p><strong>Create your administrator account</strong> to access and manage the Nutify UPS monitoring system. As the administrator, you will have full control over all system settings, user management, and UPS configurations.</p>
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' }}"></i>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <form method="POST" id="setupForm">
+                <div class="form-group">
+                    <label for="username">
+                        <i class="fas fa-user-shield"></i>
+                        Administrator Username
+                    </label>
+                    <input type="text" id="username" name="username" required 
+                           placeholder="admin (or Administrator, admin123, etc.)" 
+                           autocomplete="username" minlength="3">
+                    <div class="form-help">
+                        <strong>Suggested usernames:</strong> admin, administrator, sysadmin<br>
+                        Username must be at least 3 characters long
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">
+                        <i class="fas fa-lock"></i>
+                        Password
+                    </label>
+                    <input type="password" id="password" name="password" required 
+                           placeholder="Choose a strong password" 
+                           autocomplete="new-password" minlength="6">
+                    <div class="password-strength" style="margin-top: 0.5rem;">
+                        <div class="password-strength-bar" style="width: 100%; height: 4px; background: var(--border-color); border-radius: 2px; overflow: hidden;">
+                            <div class="password-strength-fill" id="passwordStrengthFill" style="height: 100%; transition: width 0.3s, background-color 0.3s; width: 0%;"></div>
+                        </div>
+                        <div class="password-strength-text" id="passwordStrengthText" style="font-size: 0.8rem; margin-top: 0.25rem;"></div>
+                    </div>
+                    <div class="form-help">
+                        • At least 6 characters long<br>
+                        • Mix of letters, numbers, and symbols recommended
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirm_password">
+                        <i class="fas fa-lock"></i>
+                        Confirm Password
+                    </label>
+                    <input type="password" id="confirm_password" name="confirm_password" required 
+                           placeholder="Confirm your password" 
+                           autocomplete="new-password">
+                </div>
+                
+                <div class="wizard-actions">
+                    <button type="submit" class="setup-button nav-btn next-btn" id="setupButton">
+                        <i class="fas fa-user-shield"></i>
+                        Create Administrator Account & Continue
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Password strength checker
+    function checkPasswordStrength(password) {
+        const fill = document.getElementById('passwordStrengthFill');
+        const text = document.getElementById('passwordStrengthText');
+        
+        if (password.length === 0) {
+            fill.style.width = '0%';
+            text.textContent = '';
+            return;
+        }
+        
+        let strength = 0;
+        
+        if (password.length >= 6) strength += 25;
+        if (password.length >= 8) strength += 10;
+        if (/[a-z]/.test(password)) strength += 15;
+        if (/[A-Z]/.test(password)) strength += 15;
+        if (/[0-9]/.test(password)) strength += 15;
+        if (/[^A-Za-z0-9]/.test(password)) strength += 20;
+        
+        fill.style.width = strength + '%';
+        
+        if (strength < 40) {
+            fill.style.backgroundColor = '#f56565';
+            text.textContent = 'Weak';
+            text.style.color = '#f56565';
+        } else if (strength < 70) {
+            fill.style.backgroundColor = '#ed8936';
+            text.textContent = 'Fair';
+            text.style.color = '#ed8936';
+        } else if (strength < 90) {
+            fill.style.backgroundColor = '#38a169';
+            text.textContent = 'Good';
+            text.style.color = '#38a169';
+        } else {
+            fill.style.backgroundColor = '#2b6cb0';
+            text.textContent = 'Strong';
+            text.style.color = '#2b6cb0';
+        }
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        // Focus on username field
+        document.getElementById('username').focus();
+        
+        // Password strength checker
+        document.getElementById('password').addEventListener('input', function() {
+            checkPasswordStrength(this.value);
+        });
+        
+        // Password confirmation validation
+        document.getElementById('confirm_password').addEventListener('input', function() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = this.value;
+            
+            if (confirmPassword && password !== confirmPassword) {
+                this.setCustomValidity('Passwords do not match');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+    });
+    
+    // Form submission with loading state
+    document.getElementById('setupForm').addEventListener('submit', function(e) {
+        const button = document.getElementById('setupButton');
+        button.disabled = true;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Administrator Account...';
+    });
+</script>
+{% endblock %} 

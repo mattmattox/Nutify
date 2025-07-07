@@ -1,0 +1,1077 @@
+{% extends "dashboard/setup/base.html" %}
+
+{% block title %}Nutify Setup Wizard{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/setup.css') }}">
+<style>
+    .section-divider {
+        display: flex;
+        align-items: center;
+        margin: 20px 0;
+        color: #666;
+    }
+    
+    .section-divider hr {
+        flex-grow: 1;
+        border: none;
+        border-top: 1px solid #ddd;
+        margin: 0 10px;
+    }
+    
+    .section-divider span {
+        font-size: 14px;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+    
+    .server-config-section {
+        animation: fadeIn 0.3s ease-in-out;
+        margin-top: 10px;
+        padding-top: 5px;
+    }
+    
+    .setup-icon {
+        font-size: 4em;
+        color: #4caf50;
+        margin-bottom: 20px;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="setup-container">
+    <div class="setup-header">
+        <img src="{{ url_for('static', filename='img/Nutify-Logo.png') }}" alt="Nutify Logo" class="setup-logo">
+        <h1 class="setup-title">NUT Configuration Wizard</h1>
+        <div class="setup-intro">
+            <p>This wizard will help you configure Network UPS Tools (NUT) to work with your UPS devices.</p>
+        </div>
+    </div>
+
+    <div class="setup-card">
+        <div class="card-heading">
+            <i class="fas fa-cogs"></i>
+            <h2>Simple Setup</h2>
+        </div>
+        <div class="card-content">
+            <!-- Steps Indicator -->
+            <div class="wizard-steps">
+                <div class="step active" data-step="1">
+                    <div class="step-number">1</div>
+                    <div class="step-label">Admin Setup</div>
+                </div>
+                <div class="step" data-step="2">
+                    <div class="step-number">2</div>
+                    <div class="step-label">Mode Selection</div>
+                </div>
+                <div class="step" data-step="3">
+                    <div class="step-number">3</div>
+                    <div class="step-label">Configuration</div>
+                </div>
+                <div class="step" data-step="4">
+                    <div class="step-number">4</div>
+                    <div class="step-label">Review</div>
+                </div>
+                <div class="step" data-step="5">
+                    <div class="step-number">5</div>
+                    <div class="step-label">Complete</div>
+                </div>
+            </div>
+
+            <!-- Alerts Container -->
+            <div id="alerts-container"></div>
+            
+            <!-- Step 1: Admin Setup -->
+            <div class="wizard-step-content" id="step-1">
+                <div class="text-center">
+                    <i class="fas fa-user-shield setup-icon"></i>
+                    <h3>Setup Admin Account</h3>
+                    <p>Create an administrator account to secure your Nutify dashboard.</p>
+                </div>
+                
+                <div class="wizard-form">
+                    <div class="form-group">
+                        <label for="admin_username">Admin Username:
+                            <div class="tooltip">
+                                <i class="fas fa-info-circle info-icon"></i>
+                                <span class="tooltip-text">
+                                    Choose a username for the administrator account. This will be used to login to the Nutify dashboard.
+                                </span>
+                            </div>
+                        </label>
+                        <input type="text" id="admin_username" name="admin_username" value="admin" required>
+                        <div class="form-help">Username for the administrator account</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="admin_password">Admin Password:
+                            <div class="tooltip">
+                                <i class="fas fa-info-circle info-icon"></i>
+                                <span class="tooltip-text">
+                                    Choose a strong password for the administrator account. This password will be used to login to the Nutify dashboard.
+                                </span>
+                            </div>
+                        </label>
+                        <input type="password" id="admin_password" name="admin_password" required>
+                        <div class="form-help">Strong password for the administrator account</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="admin_password_confirm">Confirm Password:
+                            <div class="tooltip">
+                                <i class="fas fa-info-circle info-icon"></i>
+                                <span class="tooltip-text">
+                                    Re-enter the password to confirm it's correct.
+                                </span>
+                            </div>
+                        </label>
+                        <input type="password" id="admin_password_confirm" name="admin_password_confirm" required>
+                        <div class="form-help">Re-enter the password to confirm</div>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Important:</strong> This administrator account will have full access to all Nutify features, including UPS management, configuration, and user management.
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 2: Mode Selection -->
+            <div class="wizard-step-content hidden" id="step-2">
+                <h3>Select NUT Operating Mode</h3>
+                <p>Choose how you want to monitor your UPS devices:</p>
+                
+                <div class="mode-options">
+                    <div class="mode-option" data-mode="standalone">
+                        <input type="radio" name="nut_mode" id="mode-standalone" value="standalone">
+                        <div class="mode-icon">
+                            <i class="fas fa-server"></i>
+                        </div>
+                        <div class="mode-title">Standalone</div>
+                        <div class="mode-description">Local UPS only, no remote services. Your UPS is directly connected to this server.</div>
+                        <div class="tooltip">
+                            <i class="fas fa-info-circle info-icon"></i>
+                            <span class="tooltip-text">
+                                Use this mode if your UPS is directly connected to this server via USB or serial and you don't need to share it with other computers. Example: A small home server with a local UPS.
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="mode-option" data-mode="netserver">
+                        <input type="radio" name="nut_mode" id="mode-netserver" value="netserver">
+                        <div class="mode-icon">
+                            <i class="fas fa-network-wired"></i>
+                        </div>
+                        <div class="mode-title">Network Server</div>
+                        <div class="mode-description">Local UPS with remote access. Share your UPS with other computers on the network.</div>
+                        <div class="tooltip">
+                            <i class="fas fa-info-circle info-icon"></i>
+                            <span class="tooltip-text">
+                                Use this mode if your UPS is directly connected to this server and you want to share it with other computers on the network. Example: A server with a UPS that needs to notify other computers about power events.
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="mode-option" data-mode="netclient">
+                        <input type="radio" name="nut_mode" id="mode-netclient" value="netclient">
+                        <div class="mode-icon">
+                            <i class="fas fa-desktop"></i>
+                        </div>
+                        <div class="mode-title">Network Client</div>
+                        <div class="mode-description">Remote UPS monitoring only. Connect to a UPS on another server on your network.</div>
+                        <div class="tooltip">
+                            <i class="fas fa-info-circle info-icon"></i>
+                            <span class="tooltip-text">
+                                Use this mode if you want to connect to a UPS that is attached to another computer running NUT in network server mode. Example: A workstation that needs to monitor a UPS connected to a different server.
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 3: Configuration -->
+            <div class="wizard-step-content hidden" id="step-3">
+                <!-- Content changes based on mode selected -->
+                
+                <!-- Standalone Mode Config -->
+                <div id="config-standalone" class="mode-config hidden">
+                    <h3>Configure Local UPS</h3>
+                    <p>Enter the details of your UPS connected to this server:</p>
+                    
+                    <div class="wizard-form">
+                        <div class="form-group">
+                            <label for="ups_name">UPS Name:
+                                <div class="tooltip">
+                                    <i class="fas fa-info-circle info-icon"></i>
+                                    <span class="tooltip-text">
+                                        A unique identifier for your UPS. This will be used in commands and configuration. Example: "ups", "server_ups", "apc1500"
+                                    </span>
+                                </div>
+                            </label>
+                            <input type="text" id="ups_name" name="ups_name" value="ups" required>
+                            <div class="form-help">A unique name for your UPS (e.g., "ups", "server_ups")</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Configuration Method:</label>
+                            <div class="config-method-options">
+                                <div class="config-method-option" id="manual-option-standalone">
+                                    <input type="radio" id="manual-standalone" name="config-method-standalone" value="manual">
+                                    <div class="method-content">
+                                        <div class="method-icon"><i class="fas fa-edit"></i></div>
+                                        <div class="method-info">
+                                            <div class="method-title">Manual Configuration</div>
+                                            <div class="method-desc">Manually enter all UPS connection details</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="config-method-option" id="auto-option-standalone">
+                                    <input type="radio" id="auto-standalone" name="config-method-standalone" value="auto">
+                                    <div class="method-content">
+                                        <div class="method-icon"><i class="fas fa-magic"></i></div>
+                                        <div class="method-info">
+                                            <div class="method-title">Auto-detect with nut-scanner</div>
+                                            <div class="method-desc">Automatically find connected UPS devices</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-help">Choose how to configure your UPS connection</div>
+                        </div>
+                        
+                        <div id="manual-config-standalone" class="config-method-section hidden">
+                            <div class="form-group">
+                                <label for="ups_driver">UPS Driver:
+                                    <div class="tooltip">
+                                        <i class="fas fa-info-circle info-icon"></i>
+                                        <span class="tooltip-text">
+                                            The driver that NUT will use to communicate with your UPS. Most USB UPS devices use usbhid-ups. Check your UPS manufacturer's documentation to determine the right driver.
+                                        </span>
+                                    </div>
+                                </label>
+                                <select id="ups_driver" name="ups_driver" required>
+                                    <!-- Driver options will be dynamically populated -->
+                                </select>
+                                <div class="form-help">Select the appropriate driver for your UPS model</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="ups_port">Port:
+                                    <div class="tooltip">
+                                        <i class="fas fa-info-circle info-icon"></i>
+                                        <span class="tooltip-text">
+                                            For most USB UPS devices, you can use "auto" to automatically detect the port. For serial UPS devices, specify the serial port (e.g., "/dev/ttyS0" on Linux or "COM1" on Windows).
+                                        </span>
+                                    </div>
+                                </label>
+                                <div class="input-with-button">
+                                <input type="text" id="ups_port" name="ups_port" value="auto" required>
+                                    <button type="button" id="scan-standalone" class="scan-button hidden">
+                                        <i class="fas fa-search"></i> Scan
+                                    </button>
+                                </div>
+                                <div class="form-help">Usually "auto" for USB, or a specific port like /dev/ttyS0 for serial</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="ups_desc">Description:
+                                    <div class="tooltip">
+                                        <i class="fas fa-info-circle info-icon"></i>
+                                        <span class="tooltip-text">
+                                            An optional human-readable description of your UPS. Example: "Server Room APC 1500VA" or "Office UPS"
+                                        </span>
+                                    </div>
+                                </label>
+                                <input type="text" id="ups_desc" name="ups_desc" value="Local UPS">
+                                <div class="form-help">Optional description of your UPS</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="server_address">Server Address:
+                                    <div class="tooltip">
+                                        <i class="fas fa-info-circle info-icon"></i>
+                                        <span class="tooltip-text">
+                                            The IP address or hostname of this server. Use "localhost" or "127.0.0.1" for local access only, or specify your server's actual IP address if other computers need to access this UPS.
+                                        </span>
+                                    </div>
+                                </label>
+                                <input type="text" id="server_address" name="server_address" value="127.0.0.1">
+                                <div class="form-help">IP address or hostname of this server (default: 127.0.0.1)</div>
+                            </div>
+                        </div>
+                        
+                        <div id="auto-config-standalone" class="config-method-section hidden">
+                            <!-- Auto-detect section will be populated by JavaScript -->
+                            <div class="server-config-section hidden" id="server-config-standalone">
+                                <div class="section-divider">
+                                    <hr>
+                                    <span>Server Configuration</span>
+                                </div>
+                                <div class="form-group">
+                                    <label for="auto_server_address">Server Address:
+                                        <div class="tooltip">
+                                            <i class="fas fa-info-circle info-icon"></i>
+                                            <span class="tooltip-text">
+                                                The IP address or hostname of this server. Use "localhost" or "127.0.0.1" for local access only, or specify your server's actual IP address if other computers need to access this UPS.
+                                            </span>
+                                        </div>
+                                    </label>
+                                    <input type="text" id="auto_server_address" name="auto_server_address" value="127.0.0.1">
+                                    <div class="form-help">IP address or hostname of this server (default: 127.0.0.1)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Network Server Mode Config -->
+                <div id="config-netserver" class="mode-config hidden">
+                    <h3>Configure Network UPS Server</h3>
+                    <p>Set up your UPS and interface access settings:</p>
+                    
+                    <div class="wizard-form">
+                        <!-- UPS Settings (Same as Standalone) -->
+                        <div class="form-group">
+                            <label for="server_ups_name">UPS Name:
+                                <div class="tooltip">
+                                    <i class="fas fa-info-circle info-icon"></i>
+                                    <span class="tooltip-text">
+                                        A unique identifier for your UPS. This name will be used by client computers to connect to this UPS. Example: "ups", "server_ups", "apc1500"
+                                    </span>
+                                </div>
+                            </label>
+                            <input type="text" id="server_ups_name" name="server_ups_name" value="ups" required>
+                            <div class="form-help">A unique name for your UPS (e.g., "ups", "server_ups")</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Configuration Method:</label>
+                            <div class="config-method-options">
+                                <div class="config-method-option" id="manual-option-netserver">
+                                    <input type="radio" id="manual-netserver" name="config-method-netserver" value="manual">
+                                    <div class="method-content">
+                                        <div class="method-icon"><i class="fas fa-edit"></i></div>
+                                        <div class="method-info">
+                                            <div class="method-title">Manual Configuration</div>
+                                            <div class="method-desc">Manually enter all UPS connection details</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="config-method-option" id="auto-option-netserver">
+                                    <input type="radio" id="auto-netserver" name="config-method-netserver" value="auto">
+                                    <div class="method-content">
+                                        <div class="method-icon"><i class="fas fa-magic"></i></div>
+                                        <div class="method-info">
+                                            <div class="method-title">Auto-detect with nut-scanner</div>
+                                            <div class="method-desc">Automatically find connected UPS devices</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-help">Choose how to configure your UPS connection</div>
+                        </div>
+                        
+                        <div id="manual-config-netserver" class="config-method-section hidden">
+                            <div class="form-group">
+                                <label for="server_ups_driver">UPS Driver:
+                                    <div class="tooltip">
+                                        <i class="fas fa-info-circle info-icon"></i>
+                                        <span class="tooltip-text">
+                                            The driver that NUT will use to communicate with your UPS. Most USB UPS devices use usbhid-ups. Check your UPS manufacturer's documentation to determine the right driver.
+                                        </span>
+                                    </div>
+                                </label>
+                                <select id="server_ups_driver" name="server_ups_driver" required>
+                                    <!-- Driver options will be dynamically populated -->
+                                </select>
+                                <div class="form-help">Select the appropriate driver for your UPS model</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="server_ups_port">Port:
+                                    <div class="tooltip">
+                                        <i class="fas fa-info-circle info-icon"></i>
+                                        <span class="tooltip-text">
+                                            For most USB UPS devices, you can use "auto" to automatically detect the port. For serial UPS devices, specify the serial port (e.g., "/dev/ttyS0" on Linux or "COM1" on Windows).
+                                        </span>
+                                    </div>
+                                </label>
+                                <div class="input-with-button">
+                                <input type="text" id="server_ups_port" name="server_ups_port" value="auto" required>
+                                    <button type="button" id="scan-netserver" class="scan-button hidden">
+                                        <i class="fas fa-search"></i> Scan
+                                    </button>
+                                </div>
+                                <div class="form-help">Usually "auto" for USB, or a specific port like /dev/ttyS0 for serial</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="server_ups_desc">Description:
+                                    <div class="tooltip">
+                                        <i class="fas fa-info-circle info-icon"></i>
+                                        <span class="tooltip-text">
+                                            An optional human-readable description of your UPS. Example: "Server Room APC 1500VA" or "Office UPS"
+                                        </span>
+                                    </div>
+                                </label>
+                                <input type="text" id="server_ups_desc" name="server_ups_desc" value="Network UPS">
+                                <div class="form-help">Optional description of your UPS</div>
+                            </div>
+                            
+                            <!-- Network Access Settings -->
+                            <div class="form-group">
+                                <label for="server_address_ns">Server Address:
+                                    <div class="tooltip">
+                                        <i class="fas fa-info-circle info-icon"></i>
+                                        <span class="tooltip-text">
+                                            The IP address or hostname of this server. Use "localhost" or "127.0.0.1" for local access only, or specify your server's actual IP address if other computers need to access this UPS.
+                                        </span>
+                                    </div>
+                                </label>
+                                <input type="text" id="server_address_ns" name="server_address_ns" value="127.0.0.1">
+                                <div class="form-help">IP address or hostname of this server (default: 127.0.0.1)</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="listen_address">Listen Address:
+                                    <div class="tooltip">
+                                        <i class="fas fa-info-circle info-icon"></i>
+                                        <span class="tooltip-text">
+                                            The IP address on which NUT will listen for connections. Use "0.0.0.0" to listen on all interfaces, or specify a specific IP address of your server if you want to restrict access.
+                                        </span>
+                                    </div>
+                                </label>
+                                <input type="text" id="listen_address" name="listen_address" value="0.0.0.0" required>
+                                <div class="form-help">IP address to listen on (0.0.0.0 for all interfaces)</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="listen_port">Listen Port:
+                                    <div class="tooltip">
+                                        <i class="fas fa-info-circle info-icon"></i>
+                                        <span class="tooltip-text">
+                                            The port on which NUT will listen for connections. The default is 3493. Only change this if you have a port conflict or need to use a specific port for firewall rules.
+                                        </span>
+                                    </div>
+                                </label>
+                                <input type="text" id="listen_port" name="listen_port" value="3493" required>
+                                <div class="form-help">Port to listen on (default is 3493)</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="admin_user">Admin Username:
+                                    <div class="tooltip">
+                                        <i class="fas fa-info-circle info-icon"></i>
+                                        <span class="tooltip-text">
+                                            The username for administrative access to your UPS. This will be used by client computers to execute commands on the UPS. Example: "admin", "upsadmin"
+                                        </span>
+                                    </div>
+                                </label>
+                                <input type="text" id="admin_user" name="admin_user" value="admin" required>
+                                <div class="form-help">Username for remote admin access</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="admin_password">Admin Password:
+                                    <div class="tooltip">
+                                        <i class="fas fa-info-circle info-icon"></i>
+                                        <span class="tooltip-text">
+                                            The password for administrative access to your UPS. Use a strong password to prevent unauthorized access, especially if your server is accessible from the internet.
+                                        </span>
+                                    </div>
+                                </label>
+                                <input type="password" id="admin_password" name="admin_password" required>
+                                <div class="form-help">Password for remote admin access</div>
+                            </div>
+                        </div>
+                        
+                        <div id="auto-config-netserver" class="config-method-section hidden">
+                            <!-- Auto-detect section will be populated by JavaScript -->
+                            <div class="server-config-section hidden" id="server-config-netserver">
+                                <div class="section-divider">
+                                    <hr>
+                                    <span>Server Configuration</span>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="auto_server_address_ns">Server Address:
+                                        <div class="tooltip">
+                                            <i class="fas fa-info-circle info-icon"></i>
+                                            <span class="tooltip-text">
+                                                The IP address or hostname of this server. Use "localhost" or "127.0.0.1" for local access only, or specify your server's actual IP address if other computers need to access this UPS.
+                                            </span>
+                                        </div>
+                                    </label>
+                                    <input type="text" id="auto_server_address_ns" name="auto_server_address_ns" value="127.0.0.1">
+                                    <div class="form-help">IP address or hostname of this server (default: 127.0.0.1)</div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="auto_listen_address">Listen Address:
+                                        <div class="tooltip">
+                                            <i class="fas fa-info-circle info-icon"></i>
+                                            <span class="tooltip-text">
+                                                The IP address on which NUT will listen for connections. Use "0.0.0.0" to listen on all interfaces, or specify a specific IP address of your server if you want to restrict access.
+                                            </span>
+                                        </div>
+                                    </label>
+                                    <input type="text" id="auto_listen_address" name="auto_listen_address" value="0.0.0.0" required>
+                                    <div class="form-help">IP address to listen on (0.0.0.0 for all interfaces)</div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="auto_listen_port">Listen Port:
+                                        <div class="tooltip">
+                                            <i class="fas fa-info-circle info-icon"></i>
+                                            <span class="tooltip-text">
+                                                The port on which NUT will listen for connections. The default is 3493. Only change this if you have a port conflict or need to use a specific port for firewall rules.
+                                            </span>
+                                        </div>
+                                    </label>
+                                    <input type="text" id="auto_listen_port" name="auto_listen_port" value="3493" required>
+                                    <div class="form-help">Port to listen on (default is 3493)</div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="auto_admin_user">Admin Username:
+                                        <div class="tooltip">
+                                            <i class="fas fa-info-circle info-icon"></i>
+                                            <span class="tooltip-text">
+                                                The username for administrative access to your UPS. This will be used by client computers to execute commands on the UPS. Example: "admin", "upsadmin"
+                                            </span>
+                                        </div>
+                                    </label>
+                                    <input type="text" id="auto_admin_user" name="auto_admin_user" value="admin" required>
+                                    <div class="form-help">Username for remote admin access</div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="auto_admin_password">Admin Password:
+                                        <div class="tooltip">
+                                            <i class="fas fa-info-circle info-icon"></i>
+                                            <span class="tooltip-text">
+                                                The password for administrative access to your UPS. Use a strong password to prevent unauthorized access, especially if your server is accessible from the internet.
+                                            </span>
+                                        </div>
+                                    </label>
+                                    <input type="password" id="auto_admin_password" name="auto_admin_password" required>
+                                    <div class="form-help">Password for remote admin access</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Network Client Mode Config -->
+                <div id="config-netclient" class="mode-config hidden">
+                    <h3>Configure Remote UPS Connection</h3>
+                    <p>Enter the details of the remote NUT server:</p>
+                    
+                    <div class="wizard-form">
+                        <div class="form-group">
+                            <label for="remote_ups_name">Remote UPS Name:
+                                <div class="tooltip">
+                                    <i class="fas fa-info-circle info-icon"></i>
+                                    <span class="tooltip-text">
+                                        The name of the UPS as configured on the remote NUT server. This must match exactly what was set up on the server. Example: "ups", "server_ups"
+                                    </span>
+                                </div>
+                            </label>
+                            <input type="text" id="remote_ups_name" name="remote_ups_name" value="ups" required>
+                            <div class="form-help">The name of the UPS on the remote server</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="remote_host">Remote Server:
+                                <div class="tooltip">
+                                    <i class="fas fa-info-circle info-icon"></i>
+                                    <span class="tooltip-text">
+                                        The IP address or hostname of the remote NUT server. Example: "192.168.1.5", "ups-server.local", "nas.example.com"
+                                    </span>
+                                </div>
+                            </label>
+                            <input type="text" id="remote_host" name="remote_host" required>
+                            <div class="form-help">IP address or hostname of the remote NUT server</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="remote_port">Remote Port:
+                                <div class="tooltip">
+                                    <i class="fas fa-info-circle info-icon"></i>
+                                    <span class="tooltip-text">
+                                        The port on which the remote NUT server is listening. The default is 3493. Only change this if the remote server uses a different port.
+                                    </span>
+                                </div>
+                            </label>
+                            <input type="text" id="remote_port" name="remote_port" value="3493">
+                            <div class="form-help">Port of the remote NUT server (default is 3493)</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="remote_user">Username:
+                                <div class="tooltip">
+                                    <i class="fas fa-info-circle info-icon"></i>
+                                    <span class="tooltip-text">
+                                        The username configured on the remote NUT server for monitor access. This is usually different from the admin user and has fewer privileges. Example: "monuser", "upsmon"
+                                    </span>
+                                </div>
+                            </label>
+                            <input type="text" id="remote_user" name="remote_user" value="monuser">
+                            <div class="form-help">Username for accessing the remote UPS</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="remote_password">Password:
+                                <div class="tooltip">
+                                    <i class="fas fa-info-circle info-icon"></i>
+                                    <span class="tooltip-text">
+                                        The password configured on the remote NUT server for the monitor user. Leave blank if the remote server does not require a password.
+                                    </span>
+                                </div>
+                            </label>
+                            <input type="password" id="remote_password" name="remote_password">
+                            <div class="form-help">Password for accessing the remote UPS</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 4: Review Configuration -->
+            <div class="wizard-step-content hidden" id="step-4">
+                <h3>Review Your Configuration</h3>
+                <p>Please review your NUT configuration before applying it:</p>
+                
+                <div class="config-summary">
+                    <!-- Will be filled dynamically -->
+                </div>
+                
+                <div class="form-group">
+                    <label for="show-config">Configuration Preview:</label>
+                    <div class="config-tabs">
+                        <button class="config-tab active" data-file="nut.conf">nut.conf</button>
+                        <button class="config-tab" data-file="ups.conf">ups.conf</button>
+                        <button class="config-tab" data-file="upsd.conf">upsd.conf</button>
+                        <button class="config-tab" data-file="upsd.users">upsd.users</button>
+                        <button class="config-tab" data-file="upsmon.conf">upsmon.conf</button>
+                        <button id="edit-config-btn" class="edit-btn">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                    </div>
+                    <div id="config-preview-container">
+                        <pre class="config-preview" id="config-preview"></pre>
+                        <div id="config-editor-container" class="hidden">
+                            <textarea id="config-editor"></textarea>
+                        </div>
+                        <div id="editor-actions" class="hidden">
+                            <button id="save-edit-btn" class="nav-btn save-btn">
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
+                            <button id="cancel-edit-btn" class="nav-btn cancel-btn">
+                                <i class="fas fa-times"></i> Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <button id="test-config-btn" class="nav-btn next-btn">
+                        <i class="fas fa-check-circle"></i> Test Configuration
+                    </button>
+                    <div id="test-result" class="hidden"></div>
+                </div>
+            </div>
+            
+
+            
+            <!-- Step 5: Complete -->
+            <div class="wizard-step-content hidden" id="step-5">
+                <div class="complete-message hidden" id="complete-success">
+                    <div class="text-center">
+                        <i class="fas fa-check-circle success-icon"></i>
+                        <h3>Configuration Complete!</h3>
+                        <p>Your NUT configuration has been successfully applied.</p>
+                        <p><strong>Please restart the server to complete the setup.</strong></p>
+                        
+                        <div class="wizard-actions text-center">
+                            <button id="restart-server-btn" class="nav-btn finish-btn">
+                                <i class="fas fa-sync"></i> Restart Server
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="complete-message hidden" id="complete-error">
+                    <div class="text-center">
+                        <i class="fas fa-exclamation-circle error-icon"></i>
+                        <h3>Configuration Failed</h3>
+                        <p>There was an error applying your NUT configuration:</p>
+                        <div class="alert alert-error" id="error-message"></div>
+                        
+                        <div class="wizard-actions text-center">
+                            <button class="nav-btn back-btn" id="restart-btn">
+                                <i class="fas fa-redo"></i> Start Over
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Navigation Buttons -->
+            <div class="wizard-actions">
+                <button class="nav-btn back-btn hidden" id="prev-btn">
+                    <i class="fas fa-arrow-left"></i> Back
+                </button>
+                <button class="nav-btn next-btn" id="next-btn">
+                    Next <i class="fas fa-arrow-right"></i>
+                </button>
+                <button class="nav-btn finish-btn hidden" id="save-btn">
+                    <i class="fas fa-save"></i> Save Configuration
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Test Configuration Modal -->
+<div id="test-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Test Configuration Result</h3>
+            <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p id="test-message"></p>
+            <div class="upsc-output" id="upsc-output"></div>
+            <div id="missing-realpower-form" class="missing-var-form hidden">
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i> Variable <strong>ups.realpower.nominal</strong> is missing but recommended. Please enter it:
+                </div>
+                <div class="form-group">
+                    <label for="ups-realpower-nominal">UPS Nominal Power (Watts):</label>
+                    <input type="number" id="ups-realpower-nominal" name="ups_realpower_nominal" min="1" placeholder="e.g. 900">
+                    <div class="form-help">The rated power capacity of your UPS in Watts</div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="nav-btn next-btn" id="close-modal-btn">Close</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/utils/restart_countdown.js') }}"></script>
+<script src="{{ url_for('static', filename='js/setup/wizard.js') }}"></script>
+<script src="{{ url_for('static', filename='js/lib/codemirror/codemirror.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/lib/codemirror/shell.min.js') }}"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='js/lib/codemirror/codemirror.min.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='js/lib/codemirror/monokai.min.css') }}">
+<style>
+    .edit-btn {
+        margin-left: auto;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+    .edit-btn:hover {
+        background-color: #388e3c;
+    }
+    #editor-actions {
+        margin-top: 10px;
+        display: flex;
+        gap: 10px;
+    }
+    .save-btn {
+        background-color: #4caf50;
+    }
+    .cancel-btn {
+        background-color: #f44336;
+    }
+    .CodeMirror {
+        height: 400px;
+        border: 1px solid #ddd;
+        font-family: monospace;
+        font-size: 14px;
+    }
+    .modified-tab::after {
+        content: "*";
+        color: #f44336;
+        margin-left: 2px;
+    }
+    
+    /* Config Method Options Styling */
+    .config-method-options {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin-top: 10px;
+    }
+    
+    .config-method-option {
+        position: relative;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .config-method-option:hover {
+        border-color: #4caf50;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .config-method-option.selected {
+        border-color: #4caf50;
+        background-color: #e9f7ef;
+        box-shadow: 0 2px 10px rgba(76, 175, 80, 0.3);
+    }
+    
+    .config-method-option input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+    
+    .method-content {
+        display: flex;
+        align-items: center;
+        padding: 15px;
+    }
+    
+    .method-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 50px;
+        height: 50px;
+        background-color: #f5f5f5;
+        border-radius: 50%;
+        margin-right: 15px;
+        color: #2c3e50;
+        font-size: 1.5em;
+        transition: all 0.3s ease;
+    }
+    
+    .config-method-option.selected .method-icon {
+        background-color: #4caf50;
+        color: white;
+    }
+    
+    .method-info {
+        flex: 1;
+    }
+    
+    .method-title {
+        font-weight: bold;
+        font-size: 1.1em;
+        color: #2c3e50;
+        margin-bottom: 5px;
+    }
+    
+    .method-desc {
+        font-size: 0.9em;
+        color: #666;
+    }
+    
+    /* Config Method Section Styling */
+    .config-method-section {
+        margin-top: 25px;
+        padding-top: 25px;
+        border-top: 1px dashed #ddd;
+        animation: fadeIn 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Scan Results Styling */
+    .scan-results {
+        margin: 15px 0;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background-color: #f8f9fa;
+        max-height: 300px;
+        overflow-y: auto;
+    }
+    
+    .scan-results-title {
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: #2c3e50;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 5px;
+    }
+    
+    .scan-device {
+        padding: 10px;
+        margin-bottom: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        background-color: white;
+    }
+    
+    .scan-device:hover {
+        background-color: #e9f7ef;
+        border-color: #4caf50;
+    }
+    
+    .scan-device.selected {
+        background-color: #e9f7ef;
+        border-color: #4caf50;
+        box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+    }
+    
+    .scan-device-name {
+        font-weight: bold;
+        color: #2c3e50;
+        margin-bottom: 5px;
+    }
+    
+    .scan-device-details {
+        font-size: 0.9em;
+        color: #666;
+    }
+    
+    .scan-loading {
+        text-align: center;
+        padding: 20px;
+        color: #666;
+    }
+    
+    .scan-loading .fa-spinner {
+        margin-right: 10px;
+        color: #4caf50;
+    }
+    
+    .no-devices-found {
+        padding: 15px;
+        text-align: center;
+        color: #d35400;
+        font-style: italic;
+    }
+    
+    /* Device Details Styling */
+    .device-details {
+        margin: 15px 0;
+        padding: 15px;
+        border: 1px solid #4caf50;
+        border-radius: 4px;
+        background-color: #e9f7ef;
+    }
+    
+    .device-details-header {
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: #2c3e50;
+        border-bottom: 1px solid #4caf50;
+        padding-bottom: 5px;
+    }
+    
+    .device-details-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 10px;
+    }
+    
+    .device-detail-item {
+        padding: 5px;
+    }
+    
+    .device-detail-item strong {
+        color: #2c3e50;
+    }
+    
+    /* Modal Improvements */
+    .modal {
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+    
+    .modal-content {
+        max-width: 900px;
+        width: 95%;
+        max-height: 80vh;
+    }
+    
+    .modal-body {
+        max-height: calc(80vh - 130px);
+        overflow-y: auto;
+    }
+    
+    .upsc-output {
+        max-height: calc(80vh - 200px);
+        overflow-y: auto;
+        margin-top: 15px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        background-color: #f5f5f5;
+        padding: 10px;
+        font-family: monospace;
+    }
+    
+    .ups-data {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 5px;
+    }
+    
+    .ups-data-item {
+        padding: 3px;
+        border-bottom: 1px solid #eee;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .ups-data-item strong {
+        color: #2c3e50;
+    }
+    
+    .missing-var-form {
+        margin-top: 20px;
+        padding: 15px;
+        border: 1px solid #f0ad4e;
+        border-radius: 4px;
+        background-color: #fcf8e3;
+    }
+    
+    .missing-var-form .form-group {
+        margin-top: 10px;
+    }
+    
+    .missing-var-form input {
+        width: 200px;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+    
+    .missing-var-form .form-help {
+        margin-top: 5px;
+        font-size: 12px;
+        color: #666;
+    }
+    
+    /* Override for centered buttons */
+    .wizard-actions.text-center {
+        justify-content: center;
+    }
+</style>
+{% endblock %} 

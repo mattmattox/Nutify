@@ -1,0 +1,40 @@
+services:
+  nut:
+#    build: .
+    image: dartsteven/test:amd64-0.1.6RC01
+    container_name: Nutify
+    privileged: true
+    cap_add:
+      - SYS_ADMIN
+      - SYS_RAWIO
+      - MKNOD
+    devices:
+      - /dev/bus/usb:/dev/bus/usb:rwm
+    device_cgroup_rules:
+      - 'c 189:* rwm'
+    volumes:
+      - ./Nutify/logs:/app/nutify/logs
+      - ./Nutify/instance:/app/nutify/instance
+      - ./Nutify/ssl:/app/ssl
+      - ./Nutify/etc/nut:/etc/nut
+      - /dev:/dev:rw              # Full /dev access improves hotplug handling
+      - /run/udev:/run/udev:ro    # Access to udev events
+    environment:
+      # ===== SERVER CONFIGURATION =====
+      - SERVER_PORT=5050
+      - SERVER_HOST=0.0.0.0
+      # ===== LOGGING CONFIGURATION =====
+      - LOG=true
+      - LOG_LEVEL=DEBUG
+      - LOG_WERKZEUG=true
+      - ENABLE_LOG_STARTUP=Y
+      - SSL_ENABLED=false
+      - SECRET_KEY=test1234567890 # for password encryption and decryption in the database
+      - UDEV=1                    # Improve USB detection
+    ports:
+      - 3493:3493
+      - 5050:5050
+      - 443:443
+    restart: always
+    user: root
+

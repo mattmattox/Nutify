@@ -1,0 +1,224 @@
+{% extends "dashboard/base.html" %}
+
+{% block title %}Nutify - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="dashboard-content">
+    <div class="content-header">
+        <h1><i class="fas fa-user-shield"></i> Admin Panel</h1>
+        <p>Manage your login credentials</p>
+    </div>
+
+    <div class="cards-grid">
+        <!-- Current User Info -->
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-user-circle"></i> Current User</h3>
+            </div>
+            <div class="card-content">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="label">Username:</span>
+                        <span class="value">{{ current_user.username }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">User ID:</span>
+                        <span class="value">#{{ current_user.id }}</span>
+                    </div>
+                    {% if current_user.last_login %}
+                    <div class="info-item">
+                        <span class="label">Last Login:</span>
+                        <span class="value">{{ current_user.last_login }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' }}"></i>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Change Password -->
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-key"></i> Change Password</h3>
+            </div>
+            <div class="card-content">
+                <p>Update your account password. You'll need to enter your current password to confirm the change.</p>
+                
+                <form method="POST" id="changePasswordForm">
+                    <input type="hidden" name="action" value="change_password">
+                    
+                    <div class="form-group">
+                        <label for="current_password">Current Password</label>
+                        <input type="password" id="current_password" name="current_password" 
+                               placeholder="Enter your current password" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="new_password">New Password</label>
+                        <input type="password" id="new_password" name="new_password" 
+                               placeholder="Enter your new password" required minlength="6">
+                        <div class="password-strength" style="margin-top: 0.5rem;">
+                            <div class="password-strength-bar" style="width: 100%; height: 4px; background: var(--border-color); border-radius: 2px; overflow: hidden;">
+                                <div class="password-strength-fill" id="passwordStrengthFill" style="height: 100%; transition: width 0.3s, background-color 0.3s; width: 0%;"></div>
+                            </div>
+                            <div class="password-strength-text" id="passwordStrengthText" style="font-size: 0.8rem; margin-top: 0.25rem;"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="confirm_new_password">Confirm New Password</label>
+                        <input type="password" id="confirm_new_password" name="confirm_new_password" 
+                               placeholder="Confirm your new password" required>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i>
+                            Update Password
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Change Username -->
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-user-edit"></i> Change Username</h3>
+            </div>
+            <div class="card-content">
+                <p>Update your username. You'll need to enter your password to confirm the change.</p>
+                
+                <form method="POST" id="changeUsernameForm">
+                    <input type="hidden" name="action" value="change_username">
+                    
+                    <div class="form-group">
+                        <label for="new_username">New Username</label>
+                        <input type="text" id="new_username" name="new_username" 
+                               placeholder="Enter your new username" required minlength="3"
+                               value="{{ current_user.username }}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Confirm Password</label>
+                        <input type="password" id="password" name="password" 
+                               placeholder="Enter your password to confirm" required>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-secondary">
+                            <i class="fas fa-save"></i>
+                            Update Username
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Logout -->
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-sign-out-alt"></i> Logout</h3>
+            </div>
+            <div class="card-content">
+                <p>Sign out of your account and return to the login page.</p>
+                
+                <div class="form-actions">
+                    <a href="{{ url_for('auth.logout') }}" class="btn btn-danger">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Password strength checker
+    function checkPasswordStrength(password) {
+        const fill = document.getElementById('passwordStrengthFill');
+        const text = document.getElementById('passwordStrengthText');
+        
+        if (password.length === 0) {
+            fill.style.width = '0%';
+            text.textContent = '';
+            return;
+        }
+        
+        let strength = 0;
+        
+        if (password.length >= 6) strength += 25;
+        if (password.length >= 8) strength += 10;
+        if (/[a-z]/.test(password)) strength += 15;
+        if (/[A-Z]/.test(password)) strength += 15;
+        if (/[0-9]/.test(password)) strength += 15;
+        if (/[^A-Za-z0-9]/.test(password)) strength += 20;
+        
+        fill.style.width = strength + '%';
+        
+        if (strength < 40) {
+            fill.style.backgroundColor = '#f56565';
+            text.textContent = 'Weak';
+            text.style.color = '#f56565';
+        } else if (strength < 70) {
+            fill.style.backgroundColor = '#ed8936';
+            text.textContent = 'Fair';
+            text.style.color = '#ed8936';
+        } else if (strength < 90) {
+            fill.style.backgroundColor = '#38a169';
+            text.textContent = 'Good';
+            text.style.color = '#38a169';
+        } else {
+            fill.style.backgroundColor = '#2b6cb0';
+            text.textContent = 'Strong';
+            text.style.color = '#2b6cb0';
+        }
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        // Password strength checker
+        document.getElementById('new_password').addEventListener('input', function() {
+            checkPasswordStrength(this.value);
+        });
+        
+        // Password confirmation validation
+        document.getElementById('confirm_new_password').addEventListener('input', function() {
+            const password = document.getElementById('new_password').value;
+            const confirmPassword = this.value;
+            
+            if (confirmPassword && password !== confirmPassword) {
+                this.setCustomValidity('Passwords do not match');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+        
+        // Form submission with loading states
+        document.getElementById('changePasswordForm').addEventListener('submit', function(e) {
+            const button = this.querySelector('button[type="submit"]');
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+        });
+        
+        document.getElementById('changeUsernameForm').addEventListener('submit', function(e) {
+            const button = this.querySelector('button[type="submit"]');
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+        });
+    });
+</script>
+{% endblock %} 

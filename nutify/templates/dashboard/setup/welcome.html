@@ -1,0 +1,47 @@
+{% extends "dashboard/setup/base.html" %}
+
+{% block title %}Welcome to Nutify Setup{% endblock %}
+
+{% block styles %}
+<!-- No additional styles needed here as they're all in setup.css now -->
+{% endblock %}
+
+{% block content %}
+<div class="setup-container">
+    <div class="setup-header">
+        <img src="{{ url_for('static', filename='img/Nutify-Logo.png') }}" alt="Nutify Logo" class="setup-logo">
+        <h1 class="setup-title">Welcome to Nutify Setup</h1>
+        <div class="setup-intro">
+            <p>This setup will help you configure Nutify to work with your UPS devices.</p>
+        </div>
+    </div>
+    
+    <div class="setup-card">
+        <div class="card-heading">
+            <i class="fas fa-cogs"></i>
+            <h2>Initial Configuration</h2>
+        </div>
+        <div class="card-content">
+            <p>Before configuring NUT, please provide some basic information about your setup:</p>
+            
+            <form id="initial-setup-form" action="{{ url_for('nut_config.setup_server_name') }}" method="post">
+                <div class="form-group">
+                    <label for="server_name">Server Name:</label>
+                    <input type="text" id="server_name" name="server_name" value="UPS" required>
+                    <div class="form-help">This name will be used to identify your UPS server in notifications and reports.</div>
+                </div>
+                
+                <div class="wizard-actions">
+                    <button type="submit" class="setup-button nav-btn next-btn">
+                        Next <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- No script needed here as we're using a direct form submission -->
+{% endblock %} 

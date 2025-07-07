@@ -1,0 +1,117 @@
+{% extends "dashboard/setup/base.html" %}
+
+{% block title %}Timezone Configuration - Nutify Setup{% endblock %}
+
+{% block styles %}
+<!-- No additional styles needed here as they're all in setup.css now -->
+{% endblock %}
+
+{% block content %}
+<div class="setup-container">
+    <div class="setup-header">
+        <img src="{{ url_for('static', filename='img/Nutify-Logo.png') }}" alt="Nutify Logo" class="setup-logo">
+        <h1 class="setup-title">Timezone Configuration</h1>
+        <div class="setup-intro">
+            <p>Select the timezone for your UPS monitoring server.</p>
+        </div>
+    </div>
+    
+    <div class="setup-card">
+        <div class="card-heading">
+            <i class="fas fa-globe"></i>
+            <h2>Select Timezone</h2>
+        </div>
+        <div class="card-content">
+            <p>The timezone will be used for all timestamps, notifications, and scheduling in the application.</p>
+            
+            <form id="timezone-form" action="{{ url_for('nut_config.setup_timezone') }}" method="post">
+                <div class="form-group">
+                    <label for="timezone">Timezone:</label>
+                    <select id="timezone" name="timezone" required>
+                        <optgroup label="Africa">
+                            {% for tz in timezones %}
+                                {% if tz.startswith('Africa/') %}
+                                    <option value="{{ tz }}" {% if tz == 'Africa/Cairo' %}selected{% endif %}>{{ tz }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </optgroup>
+                        <optgroup label="America">
+                            {% for tz in timezones %}
+                                {% if tz.startswith('America/') %}
+                                    <option value="{{ tz }}" {% if tz == 'America/New_York' %}selected{% endif %}>{{ tz }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </optgroup>
+                        <optgroup label="Antarctica">
+                            {% for tz in timezones %}
+                                {% if tz.startswith('Antarctica/') %}
+                                    <option value="{{ tz }}">{{ tz }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </optgroup>
+                        <optgroup label="Asia">
+                            {% for tz in timezones %}
+                                {% if tz.startswith('Asia/') %}
+                                    <option value="{{ tz }}">{{ tz }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </optgroup>
+                        <optgroup label="Atlantic">
+                            {% for tz in timezones %}
+                                {% if tz.startswith('Atlantic/') %}
+                                    <option value="{{ tz }}">{{ tz }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </optgroup>
+                        <optgroup label="Australia">
+                            {% for tz in timezones %}
+                                {% if tz.startswith('Australia/') %}
+                                    <option value="{{ tz }}">{{ tz }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </optgroup>
+                        <optgroup label="Europe">
+                            {% for tz in timezones %}
+                                {% if tz.startswith('Europe/') %}
+                                    <option value="{{ tz }}" {% if tz == 'Europe/Rome' %}selected{% endif %}>{{ tz }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </optgroup>
+                        <optgroup label="Indian">
+                            {% for tz in timezones %}
+                                {% if tz.startswith('Indian/') %}
+                                    <option value="{{ tz }}">{{ tz }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </optgroup>
+                        <optgroup label="Pacific">
+                            {% for tz in timezones %}
+                                {% if tz.startswith('Pacific/') %}
+                                    <option value="{{ tz }}">{{ tz }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </optgroup>
+                    </select>
+                    <div class="form-help">Select the timezone that matches your location.</div>
+                </div>
+                
+                <!-- Pass previous form values as hidden inputs -->
+                <input type="hidden" name="server_name" value="{{ server_name }}">
+                
+                <div class="wizard-actions">
+                    <a href="{{ url_for('nut_config.welcome') }}" class="nav-btn back-btn">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </a>
+                    <button type="submit" class="nav-btn next-btn">
+                        Next <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- No script needed here as we're using a direct form submission -->
+{% endblock %} 

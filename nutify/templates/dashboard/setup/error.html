@@ -1,0 +1,43 @@
+{% extends "dashboard/setup/base.html" %}
+
+{% block title %}Error - Nutify Setup{% endblock %}
+
+{% block styles %}
+<!-- No additional styles needed here as they're all in setup.css now -->
+{% endblock %}
+
+{% block content %}
+<div class="setup-container">
+    <div class="setup-header">
+        <img src="{{ url_for('static', filename='img/Nutify-Logo.png') }}" alt="Nutify Logo" class="setup-logo">
+        <h1 class="setup-title">Setup Error</h1>
+        <div class="setup-intro">
+            <p>An error occurred during the setup process.</p>
+        </div>
+    </div>
+    
+    <div class="setup-card">
+        <div class="card-heading">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h2>Error Details</h2>
+        </div>
+        <div class="card-content">
+            <div class="alert alert-error">
+                {{ error_message }}
+            </div>
+            
+            <p>Please try the setup process again or check the logs for more information.</p>
+            
+            <div class="wizard-actions">
+                <a href="{{ url_for('nut_config.welcome') }}" class="setup-button nav-btn next-btn">
+                    <i class="fas fa-redo"></i> Restart Setup
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- No script needed here -->
+{% endblock %} 

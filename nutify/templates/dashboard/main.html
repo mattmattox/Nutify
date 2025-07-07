@@ -1,0 +1,131 @@
+{% extends "dashboard/base.html" %}
+
+{% block content %}
+<div class="page">
+    <!-- Header Section -->
+
+    <!-- Key Metrics Grid -->
+    <div class="stats_grid">
+        <!-- Battery Charge -->
+        <div class="stat_card">
+            <div class="stat-icon">
+                <i class="fas fa-battery-three-quarters"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-header">
+                    <span class="stat-label">Battery Charge</span>
+                    <span class="selected-period">Now</span>
+                </div>
+                <span class="stat-value" data-type="battery">--</span>
+            </div>
+        </div>
+
+        <!-- Runtime -->
+        <div class="stat_card">
+            <div class="stat-icon">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-header">
+                    <span class="stat-label">Runtime Remaining</span>
+                    <span class="selected-period">Now</span>
+                </div>
+                <span class="stat-value" data-type="runtime">--</span>
+            </div>
+        </div>
+
+        <!-- Power Usage -->
+        <div class="stat_card">
+            <div class="stat-icon">
+                <i class="fas fa-plug"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-header">
+                    <span class="stat-label">Power Usage</span>
+                    <span class="selected-period">Now</span>
+                </div>
+                <span class="stat-value" data-type="power">--</span>
+            </div>
+        </div>
+
+        <!-- Load -->
+        <div class="stat_card">
+            <div class="stat-icon">
+                <i class="fas fa-tachometer-alt"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-header">
+                    <span class="stat-label">System Load</span>
+                    <span class="selected-period">Now</span>
+                </div>
+                <span class="stat-value" data-type="load">--</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Overview -->
+    <div class="charts_grid">
+        <!-- Combined Performance Chart -->
+        <div class="chart_card performance-chart-card">
+            <div class="chart_header">
+                <h2>System Performance</h2>
+            </div>
+            <div class="chart_container">
+                <canvas id="performanceChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Grid -->
+    <div class="bottom_grid">
+        <!-- Recent Events -->
+        <div class="combined_card">
+            <div class="combined_header">
+                <h2><i class="fas fa-history"></i> Recent Events</h2>
+            </div>
+            <div id="recentEvents" class="events-list"></div>
+        </div>
+
+        <!-- Active Alerts -->
+        <div class="combined_card">
+            <div class="combined_header">
+                <h2><i class="fas fa-bell"></i> Active Alerts</h2>
+            </div>
+            <div id="activeAlerts" class="alerts-list"></div>
+        </div>
+    </div>
+
+    <!-- Display diagnostic information if there are errors -->
+    {% if data.errors %}
+    <div class="card mb-4">
+        <div class="card-header bg-warning">
+            <h5 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i> UPS Connection Issues</h5>
+        </div>
+        <div class="card-body">
+            <div class="alert alert-warning">
+                <h6>Connection Error:</h6>
+                <p>{{ data.errors[0] }}</p>
+                
+                <h6 class="mt-3">Troubleshooting Steps:</h6>
+                <ol>
+                    <li>Check if the NUT service is running: <code>systemctl status nut-server</code> or <code>brew services info nut</code></li>
+                    <li>Verify your UPS is connected and powered on</li>
+                    <li>Check NUT configuration in <code>{{ data.get('nut_conf_dir', '/etc/nut/') }}</code></li>
+                    <li>Restart NUT service: <code>systemctl restart nut-server</code> or <code>brew services restart nut</code></li>
+                    <li>Check logs for more details: <code>journalctl -u nut-server</code> or <code>cat /var/log/nut/*.log</code></li>
+                </ol>
+                
+                <h6 class="mt-3">Current Configuration:</h6>
+                <p>UPS Name: <code>{{ data.get('ups_name', 'Not available') }}</code><br>
+                Host: <code>{{ data.get('ups_host', 'Not available') }}</code></p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/page_wrapper.js') }}"></script>
+<script src="{{ url_for('static', filename='js/main_page.js') }}"></script>
+{% endblock %}

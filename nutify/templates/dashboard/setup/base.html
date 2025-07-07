@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Nutify Setup{% endblock %}</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+    
+    <!-- Icons FontAwesome 6.7.2 -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='fonts/fontawesome/css/all.min.css') }}">
+    
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    
+    <!-- Setup CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/setup.css') }}">
+    
+    {% block styles %}{% endblock %}
+</head>
+<body class="setup-body">
+    <main class="setup-main-container">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- JavaScript -->
+    {% block scripts %}{% endblock %}
+</body>
+</html> 
