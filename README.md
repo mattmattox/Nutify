@@ -1,11 +1,8 @@
 <p align="right">
-
-  <a href="https://www.buymeacoffee.com/DartSteven" target="_blank">
-    <img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=☕&slug=DartSteven&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff" width="160"/>
-  </a>
+<a href="https://www.buymeacoffee.com/DartSteven" target="_blank">
+  <img src="https://img.buymeacoffee.com/button-api/?text=Buy%20me%20a%20coffee&amp;&amp;slug=DartSteven&amp;button_colour=FFDD00&amp;font_colour=000000&amp;font_family=Cookie&amp;outline_colour=000000&amp;coffee_colour=ffffff" width="160"/>
+</a>
 </p>
-
-
 
 <div align="center">
   <img src="pic/Nutify-Logo.png" alt="Nutify Official Logo" width="200"/>
@@ -270,8 +267,9 @@ Your support helps cover development costs and encourages further improvements a
     <img alt="Donate Bitcoin" src="https://img.shields.io/badge/Donate%20Bitcoin-F7931A?style=flat&logo=bitcoin&logoColor=white" width="160">
   </a>
   &nbsp;&nbsp;
-  <a href="https://www.buymeacoffee.com/DartSteven" target="_blank">
-    <img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=☕&slug=DartSteven&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff" width="160"/>
+<a href="https://www.buymeacoffee.com/DartSteven" target="_blank">
+  <img src="https://img.buymeacoffee.com/button-api/?text=Buy%20me%20a%20coffee&amp;&amp;slug=DartSteven&amp;button_colour=FFDD00&amp;font_colour=000000&amp;font_family=Cookie&amp;outline_colour=000000&amp;coffee_colour=ffffff" width="160"/>
+</a>
   </a>
 </p>
 
