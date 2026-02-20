@@ -28,13 +28,13 @@
 
 <p align="center">Join our Discord channel for any issues, questions, information, or testing!</p>
 <p align="center">
-  <a href="https://discord.gg/RY9H4zK2h9" target="_blank">
+  <a href="https://discord.gg/mDAYVH9M" target="_blank">
     <img alt="Nutify Bugs" src="https://img.shields.io/badge/Discord-Bugs-red?logo=discord&logoColor=white">
   </a>
-  <a href="https://discord.gg/RY9H4zK2h9" target="_blank">
+  <a href="https://discord.gg/mDAYVH9M" target="_blank">
     <img alt="Nutify Help" src="https://img.shields.io/badge/Discord-Help-blue?logo=discord&logoColor=white">
   </a>
-  <a href="https://discord.gg/RY9H4zK2h9" target="_blank">
+  <a href="https://discord.gg/mDAYVH9M" target="_blank">
     <img alt="Nutify Support" src="https://img.shields.io/badge/Discord-Support-green?logo=discord&logoColor=white">
   </a>
 </p>
