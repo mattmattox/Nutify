@@ -1,3 +1,25 @@
+> [!IMPORTANT]
+> **Internal testing images available**
+>
+> I have published new internal testing Docker images with several new features (including **multi-UPS support**):
+>
+> ```
+> docker pull dartsteven/nutify-internal-testing:0.2.0.Int.Testing.v.24-amd64
+> docker pull dartsteven/nutify-internal-testing:0.2.0.Int.Testing.v.24-mac-arm64
+> docker pull dartsteven/nutify-internal-testing:0.2.0.Int.Testing.v.24-raspberrypi5-arm64
+> docker pull dartsteven/nutify-internal-testing:0.2.0.Int.Testing.v.24-raspberrypi4-armv7
+> ```
+>
+> I’m looking for people willing to **test these builds and report feedback**.
+>
+> Before testing, please carefully read this discussion:
+> https://github.com/DartSteven/Nutify/discussions/126#discussioncomment-16036762
+>
+> The goal is to gather feedback before releasing **version 0.2.0**, which should be published soon. Testing and bug reports are extremely helpful to make sure everything works correctly before the public release.
+
+
+
+
 <p align="right">
 <a href="https://www.buymeacoffee.com/DartSteven" target="_blank">
   <img src="https://img.buymeacoffee.com/button-api/?text=Buy%20me%20a%20coffee&amp;&amp;slug=DartSteven&amp;button_colour=FFDD00&amp;font_colour=000000&amp;font_family=Cookie&amp;outline_colour=000000&amp;coffee_colour=ffffff" width="160"/>
