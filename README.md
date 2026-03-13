@@ -4,7 +4,7 @@
 > I have published new internal testing Docker images with several new features (including **multi-UPS support**):
 >
 > ```
-> docker pull dartsteven/nutify-internal-testing:0.2.0.Int.Testing.v.24-amd64
+> docker pull dartsteven/nutify-internal-testing:0.2.0.Int.Testing.v.31-amd64
 > docker pull dartsteven/nutify-internal-testing:0.2.0.Int.Testing.v.24-mac-arm64
 > docker pull dartsteven/nutify-internal-testing:0.2.0.Int.Testing.v.24-raspberrypi5-arm64
 > docker pull dartsteven/nutify-internal-testing:0.2.0.Int.Testing.v.24-raspberrypi4-armv7
